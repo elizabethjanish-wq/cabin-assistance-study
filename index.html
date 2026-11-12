@@ -1,1 +1,796 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cabin Assistance Usability Study</title>
 
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f5fa;
+  color: #17243a;
+}
+
+main {
+  max-width: 1050px;
+  margin: 30px auto;
+  padding: 0 15px;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px #00000012;
+}
+
+h1, h2 { margin-top: 0; }
+p { line-height: 1.6; }
+
+button, .button {
+  background: #163e7c;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 12px 18px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover { opacity: 0.9; }
+
+button.secondary { background: #536b88; }
+button.danger { background: #a32f32; }
+
+input {
+  padding: 11px;
+  font-size: 16px;
+  width: 250px;
+  max-width: 100%;
+}
+
+.hidden { display: none !important; }
+
+.screen {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  user-select: none;
+}
+
+.screen img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hotspot {
+  position: absolute;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.hotspot:hover {
+  background: #ffda4c30;
+  outline: 2px dashed #ffce57;
+}
+
+.hotspot:focus-visible {
+  outline: 3px solid orange;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.notice {
+  padding: 15px;
+  background: #edf3fc;
+  border-left: 4px solid #4267a5;
+  margin: 15px 0;
+}
+
+.code {
+  padding: 15px;
+  background: #f5f7fb;
+  border: 1px solid #bdc9da;
+  font-family: monospace;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+#feedback {
+  color: #a05215;
+  font-weight: bold;
+  min-height: 20px;
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<section id="welcome" class="card">
+  <h1>Cabin Assistance Interface Study</h1>
+
+  <p>
+    You will complete a general cabin-crew assistance task
+    using two simulated aircraft interfaces.
+  </p>
+
+  <p>
+    The order of the interfaces is assigned automatically.
+    No real cabin crew will be contacted.
+  </p>
+
+  <p>
+    Please participate only after reading the research information
+    and providing consent through the researcher's approved procedure.
+  </p>
+
+  <label for="pid"><strong>Anonymous participant ID:</strong></label>
+  <br><br>
+  <input id="pid" placeholder="Example: P001">
+
+  <p>
+    Use the same participant ID in Microsoft Forms.
+    Do not enter your name or email address.
+  </p>
+
+  <button id="startStudy">Begin study</button>
+  <p id="welcomeError"></p>
+</section>
+
+<section id="taskIntro" class="card hidden">
+  <h2 id="taskPosition"></h2>
+  <p id="conditionName"></p>
+
+  <h3>General cabin-crew assistance request</h3>
+
+  <div class="notice">
+    Imagine that you are seated on an aircraft and require
+    assistance from a cabin crew member.
+
+    <p>
+      Using the interface provided, initiate a
+      <strong>general cabin-crew assistance request</strong>.
+    </p>
+  </div>
+
+  <p>
+    The timer starts when you select <strong>Start task</strong>.
+  </p>
+
+  <button id="startTask">Start task</button>
+</section>
+
+<section id="task" class="card hidden">
+  <h2 id="taskLabel"></h2>
+
+  <p>
+    Interact with the aircraft interface below.
+  </p>
+
+  <div id="screen" class="screen"></div>
+
+  <p id="feedback"></p>
+
+  <div class="controls">
+    <button id="restartTask" class="secondary">
+      Restart this task
+    </button>
+
+    <button id="giveUp" class="danger">
+      I cannot complete this task
+    </button>
+  </div>
+
+  <p>
+    <small>
+      Restarting is recorded. The task timer does not reset.
+    </small>
+  </p>
+</section>
+
+<section id="taskDone" class="card hidden">
+  <h2 id="doneTitle"></h2>
+  <p id="doneText"></p>
+  <button id="nextTask">Continue</button>
+</section>
+
+<section id="finish" class="card hidden">
+  <h1>Tasks finished</h1>
+
+  <div class="notice">
+    <strong>Important:</strong>
+    Your interaction results are not saved automatically.
+    You must paste the code below into Microsoft Forms
+    and submit the questionnaire.
+  </div>
+
+  <p>
+    1. Click <strong>Copy results code</strong>.<br>
+    2. Open the Microsoft Forms questionnaire.<br>
+    3. Paste the code into the required results-code field.<br>
+    4. Complete and submit the questionnaire.
+  </p>
+
+  <div id="resultCode" class="code"></div>
+
+  <div class="controls">
+    <button id="copyCode">Copy results code</button>
+    <button id="selectCode" class="secondary">
+      Select code manually
+    </button>
+    <a id="formsLink" class="button hidden"
+       target="_blank" rel="noopener noreferrer">
+      Open Microsoft Forms
+    </a>
+  </div>
+
+  <p id="copyFeedback"></p>
+</section>
+
+</main>
+
+<script>
+"use strict";
+
+/*
+ OPTIONAL:
+ Paste your Microsoft Forms respondent link between the quotes.
+ You can also leave this empty and send participants both links.
+*/
+const MICROSOFT_FORMS_URL = "";
+
+/*
+ All five screenshots must be uploaded to the same
+ GitHub repository folder as index.html.
+*/
+const IMAGES = {
+  home: "main_screen.png",
+  pcb_menu: "cabin_attendant_call.png",
+  pcb_active: "call_activated.png",
+  sst_menu: "SST_crewcall.png",
+  sst_success: "sst_goal_feedback.png"
+};
+
+/*
+ Original screenshot dimensions.
+ These are used to position clickable areas.
+*/
+const DIMENSIONS = {
+  home: [1332, 732],
+  pcb_menu: [1339, 730],
+  pcb_active: [1339, 739],
+  sst_menu: [1014, 732],
+  sst_success: [1006, 735]
+};
+
+const $ = id => document.getElementById(id);
+
+function show(sectionId) {
+  const sections = [
+    "welcome", "taskIntro", "task", "taskDone", "finish"
+  ];
+
+  for (const id of sections) {
+    $(id).classList.toggle("hidden", id !== sectionId);
+  }
+}
+
+let state = {
+  pid: "",
+  order: [],
+  index: 0,
+  results: [],
+  condition: null,
+  screen: null,
+  start: 0,
+  events: [],
+  wrongPending: false,
+  recovery: 0,
+  errors: 0,
+  misclicks: 0,
+  clicks: 0,
+  transitions: 0,
+  restarts: 0,
+  finished: false
+};
+
+function now() {
+  return performance.now();
+}
+
+function log(kind, detail) {
+  state.events.push([
+    Math.round(now() - state.start),
+    kind,
+    detail
+  ]);
+}
+
+function rect(x, y, w, h) {
+  const [W, H] = DIMENSIONS[state.screen];
+
+  return `
+    left:${100 * x / W}%;
+    top:${100 * y / H}%;
+    width:${100 * w / W}%;
+    height:${100 * h / H}%;
+  `;
+}
+
+/*
+ Create a clickable area over a screenshot.
+*/
+function hit(x, y, w, h, label, action) {
+  const button = document.createElement("button");
+
+  button.className = "hotspot";
+  button.style.cssText = rect(x, y, w, h);
+  button.setAttribute("aria-label", label);
+  button.title = label;
+
+  button.addEventListener("click", event => {
+    event.stopPropagation();
+
+    state.clicks++;
+    log("click", label);
+
+    action();
+  });
+
+  $("screen").appendChild(button);
+}
+
+/*
+ Incorrect selection of a visible interface option.
+*/
+function wrong(label) {
+  state.errors++;
+  state.wrongPending = true;
+
+  log("incorrect_selection", label);
+
+  $("feedback").textContent =
+    "This option does not initiate a general assistance request. " +
+    "You can try another control.";
+}
+
+/*
+ Navigate between screens.
+*/
+function move(destination, reason) {
+  if (state.wrongPending) {
+    state.recovery++;
+    log("recovery", reason);
+    state.wrongPending = false;
+  }
+
+  state.transitions++;
+
+  log(
+    "navigation",
+    state.screen + "->" + destination
+  );
+
+  render(destination);
+}
+
+/*
+ Display screenshot and attach clickable areas.
+*/
+function render(which) {
+  state.screen = which;
+
+  $("feedback").textContent = "";
+
+  const root = $("screen");
+  root.replaceChildren();
+
+  const image = document.createElement("img");
+
+  image.src = IMAGES[which];
+  image.alt = "Aircraft interface: " + which;
+  image.draggable = false;
+
+  root.appendChild(image);
+
+  /*
+   A click outside a defined interactive area
+   is recorded as a misclick.
+  */
+  root.onclick = event => {
+    if (event.target !== image) return;
+
+    state.clicks++;
+    state.misclicks++;
+    state.wrongPending = true;
+
+    log("misclick", which);
+
+    $("feedback").textContent =
+      "No response. Try an available control.";
+  };
+
+  /*
+   COMMON HOME SCREEN
+   The cabin-attendant icon is in the top menu.
+  */
+  if (which === "home") {
+    hit(
+      774, 56, 48, 56,
+      "Cabin attendant icon",
+      () => move(
+        state.condition === "PCB"
+          ? "pcb_menu"
+          : "sst_menu",
+        "select_cabin_attendant"
+      )
+    );
+  }
+
+  /*
+   PCB MENU
+  */
+  if (which === "pcb_menu") {
+
+    // Activate cabin attendant call.
+    hit(
+      537, 249, 110, 110,
+      "Cabin attendant call",
+      () => {
+
+        if (state.wrongPending) {
+          state.recovery++;
+          log("recovery", "activate_call");
+          state.wrongPending = false;
+        }
+
+        state.transitions++;
+
+        log(
+          "navigation",
+          "pcb_menu->pcb_active"
+        );
+
+        render("pcb_active");
+
+        finishTask(true);
+      }
+    );
+
+    // Cancel call before activation.
+    hit(
+      734, 247, 116, 120,
+      "Cancel cabin attendant call",
+      () => wrong("cancel_call_before_activation")
+    );
+
+    // Close dialog and return to home screen.
+    hit(
+      492, 410, 390, 53,
+      "Close dialog",
+      () => move("home", "close_dialog")
+    );
+  }
+
+  /*
+   SST MENU
+  */
+  if (which === "sst_menu") {
+
+    // Correct selection: OTHER.
+    hit(
+      647, 445, 171, 51,
+      "Other / general assistance",
+      () => {
+
+        if (state.wrongPending) {
+          state.recovery++;
+          log("recovery", "select_other");
+          state.wrongPending = false;
+        }
+
+        state.transitions++;
+
+        log(
+          "navigation",
+          "sst_menu->sst_success"
+        );
+
+        render("sst_success");
+
+        finishTask(true);
+      }
+    );
+
+    // Back button.
+    hit(
+      213, 443, 163, 54,
+      "Back",
+      () => move("home", "back")
+    );
+
+    // Other visible categories.
+    hit(
+      231, 187, 224, 72,
+      "Crew call category",
+      () => wrong("crew_call_category")
+    );
+
+    hit(
+      232, 267, 571, 44,
+      "Beverages or food",
+      () => wrong("beverages_food")
+    );
+
+    hit(
+      232, 314, 571, 44,
+      "Comfort requests",
+      () => wrong("comfort_requests")
+    );
+
+    hit(
+      232, 369, 571, 44,
+      "In-flight shopping",
+      () => wrong("shopping")
+    );
+  }
+}
+
+/*
+ Prepare the next interface task.
+*/
+function setupTask() {
+  state.condition = state.order[state.index];
+
+  $("taskPosition").textContent =
+    "Task " + (state.index + 1) + " of 2";
+
+  $("conditionName").textContent =
+    state.condition === "PCB"
+      ? "Conventional call button interface"
+      : "Self-service interface";
+
+  $("taskLabel").textContent =
+    "Task " + (state.index + 1) + " of 2";
+
+  show("taskIntro");
+}
+
+/*
+ Start timer and reset task-level measurements.
+*/
+function beginTask() {
+  state.start = now();
+
+  state.events = [];
+  state.wrongPending = false;
+  state.recovery = 0;
+  state.errors = 0;
+  state.misclicks = 0;
+  state.clicks = 0;
+  state.transitions = 0;
+  state.restarts = 0;
+  state.finished = false;
+
+  show("task");
+  render("home");
+
+  log("task_started", state.condition);
+}
+
+/*
+ Finish a task after success or explicit abandonment.
+*/
+function finishTask(success) {
+  if (state.finished) return;
+
+  state.finished = true;
+
+  const elapsed = Math.round(now() - state.start);
+
+  log(
+    success ? "success" : "explicit_give_up",
+    state.screen
+  );
+
+  const record = {
+    c: state.condition,
+    s: success ? 1 : 0,
+    ms: elapsed,
+    cl: state.clicks,
+    nav: state.transitions,
+    er: state.errors,
+    mc: state.misclicks,
+    rec: state.recovery,
+    rs: state.restarts,
+    end: state.screen,
+    ev: state.events
+  };
+
+  state.results.push(record);
+
+  $("doneTitle").textContent =
+    success ? "Task completed" : "Task ended";
+
+  $("doneText").textContent = success
+    ? "The prototype displayed its simulated " +
+      "activation or confirmation feedback."
+    : "You selected 'I cannot complete this task'.";
+
+  show("taskDone");
+}
+
+/*
+ Convert results into a copyable text code.
+*/
+function encode(object) {
+  const bytes = new TextEncoder().encode(
+    JSON.stringify(object)
+  );
+
+  let binary = "";
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+/*
+ Prepare results for Microsoft Forms.
+*/
+function finishStudy() {
+  const payload = {
+    v: 1,
+    p: state.pid,
+    o: state.order.join("-"),
+    t: state.results
+  };
+
+  const code = "CABIN1." + encode(payload);
+
+  $("resultCode").textContent = code;
+
+  const formsURL = MICROSOFT_FORMS_URL.trim();
+
+  if (formsURL) {
+    $("formsLink").href = formsURL;
+    $("formsLink").classList.remove("hidden");
+  }
+
+  show("finish");
+}
+
+/*
+ Start study and assign interface order.
+*/
+$("startStudy").onclick = () => {
+  const id = $("pid").value.trim();
+
+  if (!/^[a-zA-Z0-9_-]{2,40}$/.test(id)) {
+    $("welcomeError").textContent =
+      "Enter your anonymous participant ID.";
+    return;
+  }
+
+  state.pid = id;
+
+  // Random assignment; exact 50/50 balance is not guaranteed.
+  state.order = Math.random() < 0.5
+    ? ["PCB", "SST"]
+    : ["SST", "PCB"];
+
+  state.index = 0;
+
+  setupTask();
+};
+
+$("startTask").onclick = beginTask;
+
+/*
+ Restart task without resetting elapsed time.
+*/
+$("restartTask").onclick = () => {
+  state.restarts++;
+  state.recovery++;
+
+  log("restart", state.screen);
+
+  state.wrongPending = false;
+
+  render("home");
+};
+
+/*
+ Explicit abandonment.
+*/
+$("giveUp").onclick = () => {
+  if (confirm("End this task without completing the request?")) {
+    finishTask(false);
+  }
+};
+
+/*
+ Continue to the second task or results screen.
+*/
+$("nextTask").onclick = () => {
+  state.index++;
+
+  if (state.index < 2) {
+    setupTask();
+  } else {
+    finishStudy();
+  }
+};
+
+/*
+ Copy results code.
+*/
+$("copyCode").onclick = async () => {
+  const code = $("resultCode").textContent;
+
+  try {
+    await navigator.clipboard.writeText(code);
+
+    $("copyFeedback").textContent =
+      "Copied! Paste the code into Microsoft Forms.";
+
+  } catch (error) {
+    $("copyFeedback").textContent =
+      "Automatic copying failed. " +
+      "Use 'Select code manually'.";
+  }
+};
+
+/*
+ Manual copying fallback.
+*/
+$("selectCode").onclick = () => {
+  const range = document.createRange();
+
+  range.selectNodeContents($("resultCode"));
+
+  const selection = window.getSelection();
+
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  $("copyFeedback").textContent =
+    "Code selected. Press Ctrl+C or Cmd+C.";
+};
+
+/*
+ Warn participants about leaving before finishing.
+*/
+window.addEventListener("beforeunload", event => {
+  if (state.pid && state.results.length < 2) {
+    event.preventDefault();
+    event.returnValue = "";
+  }
+});
+
+</script>
+</body>
+</html>
