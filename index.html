@@ -714,7 +714,11 @@ $("startTask").onclick = beginTask;
 */
 $("restartTask").onclick = () => {
   state.restarts++;
-  state.recovery++;
+
+  if (state.wrongPending) {
+    state.recovery++;
+    log("recovery", "restart_after_error");
+  }
 
   log("restart", state.screen);
 
