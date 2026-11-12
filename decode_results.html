@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cabin Study Results Decoder</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+textarea {
+  width: 100%;
+  height: 220px;
+  padding: 12px;
+}
+button {
+  padding: 12px 20px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+pre {
+  white-space: pre-wrap;
+  color: #9b2525;
+}
+</style>
+</head>
+<body>
+
+<h1>Cabin Study Results Decoder</h1>
+
+<p>
+Paste the experiment results codes below,
+one complete code per line.
+</p>
+
+<textarea id="codes"></textarea>
+
+<br>
+<button onclick="decodeResults()">
+  Download CSV
+</button>
+
+<pre id="message"></pre>
+
+<script>
+function decodeCode(code) {
+  if (!code.startsWith("CABIN1.")) {
+    throw new Error("Invalid results code");
+  }
+
+  let encoded = code.slice(7)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  while (encoded.length % 4) {
+    encoded += "=";
+  }
+
+  const binary = atob(encoded);
+
+  const bytes = Uint8Array.from(
+    binary,
+    character => character.charCodeAt(0)
+  );
+
+  return JSON.parse(
+    new TextDecoder().decode(bytes)
+  );
+}
+
+function csvCell(value) {
+  const text = String(value ?? "");
+
+  return '"' + text.replace(/"/g, '""') + '"';
+}
+
+function decodeResults() {
+  const input = document.getElementById("codes").value;
+
+  const codes = input
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  const headers = [
+    "participant_id",
+    "assigned_order",
+    "condition",
+    "success",
+    "time_seconds",
+    "clicks",
+    "navigation_transitions",
+    "incorrect_selections",
+    "misclicks",
+    "recovery_actions",
+    "restarts",
+    "final_screen",
+    "event_log_json"
+  ];
+
+  const rows = [headers];
+  const errors = [];
+
+  codes.forEach((code, index) => {
+    try {
+      const data = decodeCode(code);
+
+      if (!Array.isArray(data.t) || data.t.length !== 2) {
+        throw new Error("Expected two task records");
+      }
+
+      data.t.forEach(task => {
+        rows.push([
+          data.p,
+          data.o,
+          task.c,
+          task.s,
+          (task.ms / 1000).toFixed(3),
+          task.cl,
+          task.nav,
+          task.er,
+          task.mc,
+          task.rec,
+          task.rs,
+          task.end,
+          JSON.stringify(task.ev)
+        ]);
+      });
+
+    } catch (error) {
+      errors.push(
+        "Line " + (index + 1) + ": " + error.message
+      );
+    }
+  });
+
+  document.getElementById("message").textContent =
+    errors.length
+      ? errors.join("\n")
+      : "Successfully decoded " + (rows.length - 1) +
+        " task records.";
+
+  if (rows.length === 1) return;
+
+  const csv = rows
+    .map(row => row.map(csvCell).join(","))
+    .join("\r\n");
+
+  const blob = new Blob(
+    ["\uFEFF" + csv],
+    { type: "text/csv;charset=utf-8" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "cabin_study_results.csv";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
