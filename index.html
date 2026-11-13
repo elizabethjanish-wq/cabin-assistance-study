@@ -620,16 +620,34 @@ function beginTask() {
 
   log("task_started", state.condition);
 }
+/*
+ Display the final interface screenshot for 3 seconds.
+ Record task completion when the success screen is reached,
+ not after the 3-second display period.
+*/
+function showSuccessScreen(screenName) {
+  if (state.finished) return;
 
+  // Display the final screenshot.
+  render(screenName);
+
+  // Record task completion immediately.
+  const completionTime = now();
+
+  // Keep the final screenshot visible for 3 seconds.
+  setTimeout(() => {
+    finishTask(true, completionTime);
+  }, 3000);
+}
 /*
  Finish a task after success or explicit abandonment.
 */
-function finishTask(success) {
+function finishTask(success, completionTime = now()) {
   if (state.finished) return;
 
   state.finished = true;
 
-  const elapsed = Math.round(now() - state.start);
+  const elapsed = Math.round(completionTime - state.start);
 
   log(
     success ? "success" : "explicit_give_up",
