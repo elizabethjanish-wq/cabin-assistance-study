@@ -611,11 +611,15 @@ function beginTask() {
   state.restarts = 0;
   state.finished = false;
 
-  show("task");
-  render("home");
+// Reset controls for the new task.
+$("restartTask").disabled = false;
+$("giveUp").disabled = false;
+$("screen").style.pointerEvents = "auto";
 
-  log("task_started", state.condition);
-}
+show("task");
+render("home");
+
+log("task_started", state.condition);
 /*
  Display the final interface screenshot for 3 seconds.
  Record task completion when the success screen is reached,
