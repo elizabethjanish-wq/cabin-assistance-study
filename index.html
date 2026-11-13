@@ -8,6 +8,7 @@
 <title>Cabin Assistance Usability Study</title>
 
 <style>
+
 * {
   box-sizing: border-box;
 }
@@ -43,6 +44,7 @@ p {
 
 button,
 .button {
+  display: inline-block;
   background: #163e7c;
   color: white;
   border: none;
@@ -53,7 +55,8 @@ button,
   text-decoration: none;
 }
 
-button:hover:not(:disabled) {
+button:hover:not(:disabled),
+.button:hover {
   opacity: 0.9;
 }
 
@@ -70,7 +73,7 @@ button.danger {
   background: #a32f32;
 }
 
-input {
+input[type="text"] {
   padding: 11px;
   font-size: 16px;
   width: 250px;
@@ -118,6 +121,7 @@ input {
   gap: 12px;
   flex-wrap: wrap;
   margin-top: 15px;
+  align-items: center;
 }
 
 .notice {
@@ -148,6 +152,26 @@ input {
   font-weight: bold;
   color: #163e7c;
 }
+
+.small {
+  font-size: 14px;
+}
+
+.checkline {
+  display: block;
+  margin: 18px 0;
+  line-height: 1.5;
+}
+
+.checkline input {
+  width: auto;
+  margin-right: 8px;
+}
+
+.error {
+  color: #a32f32;
+}
+
 </style>
 </head>
 
@@ -155,51 +179,89 @@ input {
 
 <main>
 
+
+<!-- ========================================= -->
 <!-- WELCOME -->
+<!-- ========================================= -->
 
 <section id="welcome" class="card">
 
   <h1>Cabin Assistance Interface Study</h1>
 
   <p>
-    You will complete a general cabin-crew assistance task
-    using two simulated aircraft interfaces.
+    This experiment is Part 2 of a three-part study.
+    Before continuing, complete
+    <strong>Form 1: Consent and demographics</strong>
+    and submit it.
   </p>
 
   <p>
-    The order of the interfaces is assigned automatically.
+    <a
+      id="initialFormLink"
+      class="button"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Open Form 1 — Consent and demographics
+    </a>
+  </p>
+
+  <p>
+    You will perform a general cabin-crew assistance task
+    using two simulated aircraft interfaces.
+    The interface order is randomly assigned.
     No real cabin crew will be contacted.
   </p>
 
-  <p>
-    Please participate only after reading the research
-    information and providing consent through the
-    researcher's approved procedure.
-  </p>
-
   <label for="pid">
-    <strong>Anonymous participant ID:</strong>
+    <strong>
+      Anonymous participant ID (from Form 1):
+    </strong>
   </label>
 
   <br><br>
 
-  <input id="pid" placeholder="Example: P001">
+  <input
+    id="pid"
+    type="text"
+    autocomplete="off"
+    placeholder="Enter your Form 1 ID"
+  >
 
   <p>
-    Use the same participant ID in Microsoft Forms.
+    Use exactly the same ID in all three
+    Microsoft Forms questionnaires.
     Do not enter your name or email address.
   </p>
+
+  <label class="checkline">
+
+    <input
+      id="form1Confirmed"
+      type="checkbox"
+    >
+
+    I have submitted Form 1, including my consent,
+    and I am aged 18 or older.
+
+  </label>
 
   <button id="startStudy">
     Begin study
   </button>
 
-  <p id="welcomeError" role="status"></p>
+  <p
+    id="welcomeError"
+    class="error"
+    role="status"
+  ></p>
 
 </section>
 
 
+<!-- ========================================= -->
 <!-- TASK INSTRUCTIONS -->
+<!-- ========================================= -->
 
 <section id="taskIntro" class="card hidden">
 
@@ -207,7 +269,9 @@ input {
 
   <p id="conditionName"></p>
 
-  <h3>General cabin-crew assistance request</h3>
+  <h3>
+    General cabin-crew assistance request
+  </h3>
 
   <div class="notice">
 
@@ -218,7 +282,9 @@ input {
 
     <p>
       Using the interface provided, initiate a
-      <strong>general cabin-crew assistance request</strong>.
+      <strong>
+        general cabin-crew assistance request
+      </strong>.
     </p>
 
   </div>
@@ -235,7 +301,9 @@ input {
 </section>
 
 
+<!-- ========================================= -->
 <!-- ACTIVE TASK -->
+<!-- ========================================= -->
 
 <section id="task" class="card hidden">
 
@@ -245,19 +313,34 @@ input {
     Interact with the aircraft interface below.
   </p>
 
-  <div id="screen" class="screen"></div>
+  <div
+    id="screen"
+    class="screen"
+  ></div>
 
-  <p id="feedback" role="status"></p>
+  <p
+    id="feedback"
+    role="status"
+  ></p>
 
-  <p id="status" role="status"></p>
+  <p
+    id="status"
+    role="status"
+  ></p>
 
   <div class="controls">
 
-    <button id="restartTask" class="secondary">
+    <button
+      id="restartTask"
+      class="secondary"
+    >
       Restart this task
     </button>
 
-    <button id="giveUp" class="danger">
+    <button
+      id="giveUp"
+      class="danger"
+    >
       I cannot complete this task
     </button>
 
@@ -273,47 +356,139 @@ input {
 </section>
 
 
-<!-- ABANDONED TASK -->
+<!-- ========================================= -->
+<!-- BETWEEN TASKS: FORM 2 -->
+<!-- ========================================= -->
 
-<section id="taskDone" class="card hidden">
+<section id="between" class="card hidden">
 
-  <h2 id="doneTitle"></h2>
+  <h2>
+    Task 1 finished — please complete Form 2
+  </h2>
 
-  <p id="doneText"></p>
-
-  <button id="nextTask">
-    Continue
-  </button>
-
-</section>
-
-
-<!-- FINAL RESULTS -->
-
-<section id="finish" class="card hidden">
-
-  <h1>Tasks finished</h1>
+  <p id="betweenOutcome"></p>
 
   <div class="notice">
 
-    <strong>Important:</strong>
+    <p>
+      You have just used:
+      <strong id="firstCondition"></strong>.
+    </p>
 
     <p>
-      Your interaction results are not saved automatically.
-      You must paste the code below into Microsoft Forms
-      and submit the questionnaire.
+      Complete SUS, NASA-TLX and the feedback questions
+      about <strong>this first interface only</strong>.
     </p>
 
   </div>
 
   <p>
-    1. Click <strong>Copy results code</strong>.<br>
-    2. Open the Microsoft Forms questionnaire.<br>
-    3. Paste the code into the required results-code field.<br>
-    4. Complete and submit the questionnaire.
+    <strong>Step 1:</strong>
+    Open Form 2 in a new tab and submit your answers.
+    Keep this experiment tab open.
   </p>
 
-  <div id="resultCode" class="code"></div>
+  <p>
+
+    <a
+      id="task1FormLink"
+      class="button"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Open Form 2 — Evaluate Task 1
+    </a>
+
+  </p>
+
+  <p>
+    <strong>Step 2:</strong>
+    After submitting Form 2, return to this tab.
+  </p>
+
+  <label class="checkline">
+
+    <input
+      id="form2Confirmed"
+      type="checkbox"
+    >
+
+    I have submitted Form 2 for the first interface.
+
+  </label>
+
+  <button
+    id="continueTask2"
+    disabled
+  >
+    Continue to Task 2
+  </button>
+
+  <p class="small">
+    The experiment cannot independently verify
+    a Microsoft Forms submission.
+    Please submit Form 2 before continuing.
+  </p>
+
+</section>
+
+
+<!-- ========================================= -->
+<!-- FINAL RESULTS: FORM 3 -->
+<!-- ========================================= -->
+
+<section id="finish" class="card hidden">
+
+  <h1>
+    Both tasks finished — final questionnaire
+  </h1>
+
+  <div class="notice">
+
+    <p>
+      <strong>Important:</strong>
+      Your results have been saved temporarily
+      in this browser, but they are
+      <strong>not submitted to the researcher</strong>
+      until you paste the complete code into Form 3
+      and submit that form.
+    </p>
+
+  </div>
+
+  <p>
+    You have just used:
+    <strong id="secondCondition"></strong>.
+  </p>
+
+  <p>
+    <strong>1.</strong>
+    Click <strong>Copy results code</strong>.
+
+    <br>
+
+    <strong>2.</strong>
+    Open Form 3 in a new tab.
+
+    <br>
+
+    <strong>3.</strong>
+    Answer the questions about the second interface
+    and your overall preference.
+
+    <br>
+
+    <strong>4.</strong>
+    Paste the complete
+    <code>CABIN1.</code>
+    code into the required results-code field
+    and submit Form 3.
+  </p>
+
+  <div
+    id="resultCode"
+    class="code"
+  ></div>
 
   <div class="controls">
 
@@ -321,22 +496,48 @@ input {
       Copy results code
     </button>
 
-    <button id="selectCode" class="secondary">
+    <button
+      id="selectCode"
+      class="secondary"
+    >
       Select code manually
     </button>
 
     <a
-      id="formsLink"
-      class="button hidden"
+      id="finalFormLink"
+      class="button"
       target="_blank"
       rel="noopener noreferrer"
     >
-      Open Microsoft Forms
+      Open Form 3 — Final questionnaire
     </a>
 
   </div>
 
-  <p id="copyFeedback" role="status"></p>
+  <p
+    id="copyFeedback"
+    role="status"
+  ></p>
+
+  <p class="small">
+    Do not close this experiment tab until
+    Form 3 has been submitted successfully.
+
+    Your code will remain available if you
+    refresh this page in the same browser.
+  </p>
+
+  <p>
+
+    <button
+      id="clearStudy"
+      class="secondary"
+    >
+      Clear saved study data
+      (after submitting Form 3)
+    </button>
+
+  </p>
 
 </section>
 
@@ -344,7 +545,29 @@ input {
 
 
 <script>
+
 "use strict";
+
+
+/*
+==================================================
+MICROSOFT FORMS LINKS
+==================================================
+*/
+
+const FORMS = {
+
+  initial:
+    "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=WaLcMRT3SEy6XKqW3PYKqhk6ko7tNs1MtPbrLO_T4olUMUhEOFlKRlpVRTc3VU83RDlKT1I0WlRWNS4u",
+
+  first:
+    "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=WaLcMRT3SEy6XKqW3PYKqhk6ko7tNs1MtPbrLO_T4olUM0k5NTMzSk4yREFBVUpCNFNKUU4xRzI0VS4u",
+
+  final:
+    "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=WaLcMRT3SEy6XKqW3PYKqhk6ko7tNs1MtPbrLO_T4olUQ01GQzIyWkNHMFI3OVFRUTdIUDdLQjRZNy4u"
+
+};
+
 
 /*
 ==================================================
@@ -352,30 +575,58 @@ CONFIGURATION
 ==================================================
 */
 
-// Optional: paste your Microsoft Forms link here.
-const MICROSOFT_FORMS_URL = "";
-
-// Confirmation screenshot display duration.
 const CONFIRMATION_DURATION_MS = 3000;
 
-// Image filenames must match the uploaded files.
+const STORAGE_KEY =
+  "cabin_assistance_study_v2";
+
+
+/*
+==================================================
+SCREENSHOT FILENAMES
+==================================================
+*/
+
 const IMAGES = {
-  home: "main_screen.png",
-  pcb_menu: "cabin_attendant_call.png",
-  pcb_active: "call_activated.png",
-  sst_menu: "SST_crewcall.png",
-  sst_success: "sst_goal_feedback.png"
+
+  home:
+    "main_screen.png",
+
+  pcb_menu:
+    "cabin_attendant_call.png",
+
+  pcb_active:
+    "call_activated.png",
+
+  sst_menu:
+    "SST_crewcall.png",
+
+  sst_success:
+    "sst_goal_feedback.png"
+
 };
 
-// Original screenshot dimensions.
-// Used to position invisible clickable areas.
+
+/*
+==================================================
+SCREENSHOT DIMENSIONS
+==================================================
+*/
+
 const DIMENSIONS = {
+
   home: [1332, 732],
+
   pcb_menu: [1339, 730],
+
   pcb_active: [1339, 739],
+
   sst_menu: [1014, 732],
+
   sst_success: [1006, 735]
+
 };
+
 
 const $ = id => document.getElementById(id);
 
@@ -387,129 +638,308 @@ STUDY STATE
 */
 
 const state = {
+
   pid: "",
+
   order: [],
+
   index: 0,
+
   condition: null,
 
   results: [],
 
   screen: null,
+
   start: 0,
+
+  startWall: 0,
 
   events: [],
 
   wrongPending: false,
+
   recovery: 0,
+
   errors: 0,
+
   misclicks: 0,
+
   clicks: 0,
+
   transitions: 0,
+
   restarts: 0,
 
   finished: false,
-  confirmationTimer: null
+
+  phase: "welcome",
+
+  confirmationTimer: null,
+
+  confirmationDeadline: 0
+
 };
+
+
+let imagesReady = false;
+
+let storageAvailable = true;
 
 
 /*
 ==================================================
-IMAGE PRELOADING
+SAVE PROGRESS IN BROWSER
 ==================================================
 */
 
-let imagesReady = false;
+function saveProgress() {
 
-async function preloadImages() {
+  try {
 
-  const paths = Object.values(IMAGES);
+    const snapshot = {
 
-  await Promise.all(
-    paths.map(path => {
-      return new Promise((resolve, reject) => {
+      ...state,
 
-        const image = new Image();
+      confirmationTimer: null
 
-        image.onload = async () => {
-          try {
-            if (typeof image.decode === "function") {
-              await image.decode();
-            }
+    };
 
-            resolve();
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(snapshot)
+    );
 
-          } catch (error) {
-            reject(
-              new Error("Cannot decode image: " + path)
-            );
-          }
-        };
+  } catch (error) {
 
-        image.onerror = () => {
-          reject(
-            new Error("Cannot load image: " + path)
-          );
-        };
+    storageAvailable = false;
 
-        image.src = path;
+  }
 
-      });
-    })
-  );
-
-  imagesReady = true;
 }
 
 
 /*
 ==================================================
-DISPLAY HELPERS
+RESTORE SAVED PROGRESS
+==================================================
+*/
+
+function loadProgress() {
+
+  try {
+
+    const raw = localStorage.getItem(
+      STORAGE_KEY
+    );
+
+    if (!raw) {
+      return false;
+    }
+
+    const data = JSON.parse(raw);
+
+    if (
+      !data ||
+      !/^[a-zA-Z0-9_-]{2,40}$/.test(data.pid) ||
+      !Array.isArray(data.order) ||
+      data.order.length !== 2 ||
+      !["PCB-SST", "SST-PCB"].includes(
+        data.order.join("-")
+      ) ||
+      !Array.isArray(data.results) ||
+      data.results.length > 2 ||
+      ![
+        "intro",
+        "active",
+        "confirmation",
+        "between",
+        "finish"
+      ].includes(data.phase)
+    ) {
+
+      return false;
+
+    }
+
+    Object.assign(
+      state,
+      data,
+      {
+        confirmationTimer: null
+      }
+    );
+
+    return true;
+
+  } catch (error) {
+
+    return false;
+
+  }
+
+}
+
+
+/*
+==================================================
+TIMING
+==================================================
+*/
+
+function now() {
+
+  return performance.now();
+
+}
+
+
+function elapsedMs() {
+
+  return Math.max(
+    0,
+    Math.round(
+      Date.now() - state.startWall
+    )
+  );
+
+}
+
+
+/*
+==================================================
+EVENT LOGGING
+==================================================
+*/
+
+function log(kind, detail) {
+
+  state.events.push([
+
+    elapsedMs(),
+
+    kind,
+
+    detail
+
+  ]);
+
+  saveProgress();
+
+}
+
+
+/*
+==================================================
+PRELOAD SCREENSHOTS
+==================================================
+*/
+
+async function preloadImages() {
+
+  await Promise.all(
+
+    Object.values(IMAGES).map(path => {
+
+      return new Promise((resolve, reject) => {
+
+        const img = new Image();
+
+        img.onload = () => {
+          resolve();
+        };
+
+        img.onerror = () => {
+
+          reject(
+            new Error(
+              "Cannot load image: " + path
+            )
+          );
+
+        };
+
+        img.src = path;
+
+      });
+
+    })
+
+  );
+
+  imagesReady = true;
+
+}
+
+
+/*
+==================================================
+SHOW PAGE SECTION
 ==================================================
 */
 
 function show(sectionId) {
 
   const sections = [
+
     "welcome",
+
     "taskIntro",
+
     "task",
-    "taskDone",
+
+    "between",
+
     "finish"
+
   ];
 
   for (const id of sections) {
 
     $(id).classList.toggle(
+
       "hidden",
+
       id !== sectionId
+
     );
 
   }
-}
-
-
-function now() {
-  return performance.now();
-}
-
-
-function log(kind, detail) {
-
-  state.events.push([
-    Math.round(now() - state.start),
-    kind,
-    detail
-  ]);
 
 }
 
+
+/*
+==================================================
+INTERFACE LABEL
+==================================================
+*/
+
+function labelFor(condition) {
+
+  return condition === "PCB"
+
+    ? "Conventional Passenger Call Button (PCB)"
+
+    : "Self-Service Touchscreen Interface (SST)";
+
+}
+
+
+/*
+==================================================
+ENABLE OR DISABLE TASK CONTROLS
+==================================================
+*/
 
 function setTaskControlsEnabled(enabled) {
 
   $("restartTask").disabled = !enabled;
+
   $("giveUp").disabled = !enabled;
 
   $("screen").style.pointerEvents =
+
     enabled ? "auto" : "none";
 
 }
@@ -517,7 +947,7 @@ function setTaskControlsEnabled(enabled) {
 
 /*
 ==================================================
-CLICKABLE SCREEN AREAS
+CLICKABLE AREA POSITIONING
 ==================================================
 */
 
@@ -526,39 +956,70 @@ function rect(x, y, w, h) {
   const [W, H] = DIMENSIONS[state.screen];
 
   return `
+
     left:${100 * x / W}%;
+
     top:${100 * y / H}%;
+
     width:${100 * w / W}%;
+
     height:${100 * h / H}%;
+
   `;
+
 }
 
 
+/*
+==================================================
+CREATE CLICKABLE HOTSPOT
+==================================================
+*/
+
 function hit(x, y, w, h, label, action) {
 
-  const button = document.createElement("button");
+  const button = document.createElement(
+    "button"
+  );
 
   button.type = "button";
+
   button.className = "hotspot";
 
-  button.style.cssText = rect(x, y, w, h);
+  button.style.cssText = rect(
+    x, y, w, h
+  );
 
-  button.setAttribute("aria-label", label);
+  button.setAttribute(
+    "aria-label",
+    label
+  );
+
   button.title = label;
 
-  button.addEventListener("click", event => {
+  button.addEventListener(
+    "click",
+    event => {
 
-    event.stopPropagation();
+      event.stopPropagation();
 
-    if (state.finished) return;
+      if (state.finished) {
+        return;
+      }
 
-    state.clicks++;
+      state.clicks++;
 
-    log("click", label);
+      log(
+        "click",
+        label
+      );
 
-    action();
+      action();
 
-  });
+      saveProgress();
+
+    }
+  );
 
   $("screen").appendChild(button);
 
@@ -567,35 +1028,57 @@ function hit(x, y, w, h, label, action) {
 
 /*
 ==================================================
-ERROR RECORDING
+INCORRECT SELECTION
 ==================================================
 */
 
 function wrong(label) {
 
-  if (state.finished) return;
+  if (state.finished) {
+    return;
+  }
 
   state.errors++;
+
   state.wrongPending = true;
 
-  log("incorrect_selection", label);
+  log(
+    "incorrect_selection",
+    label
+  );
 
   $("feedback").textContent =
+
     "This option does not initiate a general " +
     "assistance request. You can try another control.";
+
+  saveProgress();
 
 }
 
 
+/*
+==================================================
+RECOVERY ACTION
+==================================================
+*/
+
 function recordRecovery(reason) {
 
-  if (!state.wrongPending) return;
+  if (!state.wrongPending) {
+    return;
+  }
 
   state.recovery++;
 
-  log("recovery", reason);
+  log(
+    "recovery",
+    reason
+  );
 
   state.wrongPending = false;
+
+  saveProgress();
 
 }
 
@@ -608,26 +1091,29 @@ SCREEN NAVIGATION
 
 function move(destination, reason) {
 
-  if (state.finished) return;
-
-  /*
-   A return to the home screen is logged as
-   navigation. It is not automatically treated
-   as successful error recovery.
-  */
+  if (state.finished) {
+    return;
+  }
 
   if (destination !== "home") {
+
     recordRecovery(reason);
+
   }
 
   state.transitions++;
 
   log(
+
     "navigation",
+
     state.screen + "->" + destination
+
   );
 
   render(destination);
+
+  saveProgress();
 
 }
 
@@ -641,7 +1127,11 @@ SCREEN RENDERING
 function render(which) {
 
   if (!IMAGES[which]) {
-    throw new Error("Unknown screen: " + which);
+
+    throw new Error(
+      "Unknown screen: " + which
+    );
+
   }
 
   state.screen = which;
@@ -652,32 +1142,52 @@ function render(which) {
 
   root.replaceChildren();
 
-  const image = document.createElement("img");
+  const img = document.createElement(
+    "img"
+  );
 
-  image.src = IMAGES[which];
-  image.alt = "Aircraft interface: " + which;
-  image.draggable = false;
+  img.src = IMAGES[which];
 
-  root.appendChild(image);
+  img.alt = "Aircraft interface: " + which;
+
+  img.draggable = false;
+
+  root.appendChild(img);
+
 
   /*
-   Record clicks outside defined hotspots.
+  ----------------------------------------------
+  RECORD MISCLICKS
+  ----------------------------------------------
   */
 
   root.onclick = event => {
 
-    if (state.finished) return;
-    if (event.target !== image) return;
+    if (
+      state.finished ||
+      event.target !== img
+    ) {
+
+      return;
+
+    }
 
     state.clicks++;
+
     state.misclicks++;
 
     state.wrongPending = true;
 
-    log("misclick", which);
+    log(
+      "misclick",
+      which
+    );
 
     $("feedback").textContent =
+
       "No response. Try an available control.";
+
+    saveProgress();
 
   };
 
@@ -691,22 +1201,31 @@ function render(which) {
   if (which === "home") {
 
     hit(
+
       774, 56, 48, 56,
+
       "Cabin attendant icon",
 
       () => {
 
         const destination =
+
           state.condition === "PCB"
+
             ? "pcb_menu"
+
             : "sst_menu";
 
         move(
+
           destination,
+
           "select_cabin_attendant"
+
         );
 
       }
+
     );
 
   }
@@ -720,47 +1239,69 @@ function render(which) {
 
   if (which === "pcb_menu") {
 
-    // Activate the cabin attendant call.
     hit(
+
       537, 249, 110, 110,
+
       "Cabin attendant call",
 
       () => {
 
-        recordRecovery("activate_call");
+        recordRecovery(
+          "activate_call"
+        );
 
         state.transitions++;
 
         log(
+
           "navigation",
+
           "pcb_menu->pcb_active"
+
         );
 
-        showSuccessScreen("pcb_active");
+        showSuccessScreen(
+          "pcb_active"
+        );
 
       }
+
     );
 
 
-    // Cancel before activation.
     hit(
+
       734, 247, 116, 120,
+
       "Cancel cabin attendant call",
 
       () => {
-        wrong("cancel_call_before_activation");
+
+        wrong(
+          "cancel_call_before_activation"
+        );
+
       }
+
     );
 
 
-    // Close dialog.
     hit(
+
       492, 410, 390, 53,
+
       "Close dialog",
 
       () => {
-        move("home", "close_dialog");
+
+        move(
+          "home",
+          "close_dialog"
+        );
+
       }
+
     );
 
   }
@@ -774,74 +1315,120 @@ function render(which) {
 
   if (which === "sst_menu") {
 
-    // Correct selection: OTHER.
     hit(
+
       647, 445, 171, 51,
+
       "Other / general assistance",
 
       () => {
 
-        recordRecovery("select_other");
+        recordRecovery(
+          "select_other"
+        );
 
         state.transitions++;
 
         log(
+
           "navigation",
+
           "sst_menu->sst_success"
+
         );
 
-        showSuccessScreen("sst_success");
+        showSuccessScreen(
+          "sst_success"
+        );
 
       }
+
     );
 
 
-    // Back button.
     hit(
+
       213, 443, 163, 54,
+
       "Back",
 
       () => {
-        move("home", "back");
+
+        move(
+          "home",
+          "back"
+        );
+
       }
+
     );
 
 
-    // Other visible categories.
     hit(
+
       231, 187, 224, 72,
+
       "Crew call category",
 
       () => {
-        wrong("crew_call_category");
+
+        wrong(
+          "crew_call_category"
+        );
+
       }
+
     );
 
+
     hit(
+
       232, 267, 571, 44,
+
       "Beverages or food",
 
       () => {
-        wrong("beverages_food");
+
+        wrong(
+          "beverages_food"
+        );
+
       }
+
     );
 
+
     hit(
+
       232, 314, 571, 44,
+
       "Comfort requests",
 
       () => {
-        wrong("comfort_requests");
+
+        wrong(
+          "comfort_requests"
+        );
+
       }
+
     );
 
+
     hit(
+
       232, 369, 571, 44,
+
       "In-flight shopping",
 
       () => {
-        wrong("shopping");
+
+        wrong(
+          "shopping"
+        );
+
       }
+
     );
 
   }
@@ -851,76 +1438,100 @@ function render(which) {
 
 /*
 ==================================================
-TASK SETUP
+SET UP NEXT TASK
 ==================================================
 */
 
 function setupTask() {
 
-  if (state.index >= 2) {
+  if (state.results.length >= 2) {
+
     finishStudy();
+
     return;
+
   }
 
-  state.condition = state.order[state.index];
+  state.index = state.results.length;
+
+  state.condition = state.order[
+    state.index
+  ];
+
+  state.phase = "intro";
 
   $("taskPosition").textContent =
+
     "Task " + (state.index + 1) + " of 2";
 
   $("conditionName").textContent =
-    state.condition === "PCB"
-      ? "Conventional call button interface"
-      : "Self-service interface";
+
+    labelFor(state.condition);
 
   $("taskLabel").textContent =
+
     "Task " + (state.index + 1) + " of 2";
 
   $("status").textContent = "";
 
   show("taskIntro");
 
+  saveProgress();
+
 }
 
 
 /*
 ==================================================
-START TASK
+BEGIN TASK
 ==================================================
 */
 
 function beginTask() {
 
-  // Clear any previous confirmation timer.
+  if (state.phase !== "intro") {
+    return;
+  }
+
   if (state.confirmationTimer !== null) {
 
-    clearTimeout(state.confirmationTimer);
+    clearTimeout(
+      state.confirmationTimer
+    );
 
     state.confirmationTimer = null;
 
   }
 
-  state.events = [];
+  Object.assign(state, {
 
-  state.wrongPending = false;
+    events: [],
 
-  state.recovery = 0;
-  state.errors = 0;
-  state.misclicks = 0;
-  state.clicks = 0;
-  state.transitions = 0;
-  state.restarts = 0;
+    wrongPending: false,
 
-  state.finished = false;
+    recovery: 0,
+
+    errors: 0,
+
+    misclicks: 0,
+
+    clicks: 0,
+
+    transitions: 0,
+
+    restarts: 0,
+
+    finished: false,
+
+    confirmationDeadline: 0
+
+  });
 
   $("feedback").textContent = "";
+
   $("status").textContent = "";
 
   setTaskControlsEnabled(true);
-
-  /*
-   Render the common home screen before
-   starting the task timer.
-  */
 
   render("home");
 
@@ -928,29 +1539,53 @@ function beginTask() {
 
   state.start = now();
 
-  log("task_started", state.condition);
+  state.startWall = Date.now();
+
+  state.phase = "active";
+
+  log(
+    "task_started",
+    state.condition
+  );
+
+  saveProgress();
 
 }
 
 
 /*
 ==================================================
-RECORD TASK RESULT
+SAVE TASK RESULT
 ==================================================
 */
 
-function saveTaskResult(success, endScreen, completionTime) {
+function saveTaskResult(
+  success,
+  endScreen,
+  completionTime
+) {
 
-  const elapsed = Math.round(
-    completionTime - state.start
+  const elapsed = Math.max(
+
+    0,
+
+    Math.round(
+      completionTime - state.startWall
+    )
+
   );
 
   log(
-    success ? "success" : "explicit_give_up",
+
+    success
+      ? "success"
+      : "explicit_give_up",
+
     endScreen
+
   );
 
-  const record = {
+  state.results.push({
 
     c: state.condition,
 
@@ -972,142 +1607,216 @@ function saveTaskResult(success, endScreen, completionTime) {
 
     end: endScreen,
 
-    ev: state.events
+    ev: state.events.map(
+      event => event.slice()
+    )
 
-  };
+  });
 
-  state.results.push(record);
-
-}
-
-
-/*
-==================================================
-ADVANCE AFTER A COMPLETED TASK
-==================================================
-*/
-
-function advanceStudy() {
-
-  /*
-   Use the number of saved task records to
-   determine the next position.
-  */
-
-  state.index = state.results.length;
-
-  if (state.index < 2) {
-
-    setupTask();
-
-  } else {
-
-    finishStudy();
-
-  }
+  saveProgress();
 
 }
 
 
 /*
 ==================================================
-SUCCESS SCREEN
+SUCCESS CONFIRMATION
 ==================================================
 */
 
 function showSuccessScreen(screenName) {
 
-  if (state.finished) return;
+  if (state.finished) {
+    return;
+  }
 
   /*
    Capture completion time immediately.
-   The 3-second display is excluded.
+   The 3-second confirmation is excluded.
   */
 
-  const completionTime = now();
+  const completionTime = Date.now();
 
   state.finished = true;
 
-  /*
-   Display the correct final screenshot.
-  */
-
   render(screenName);
-
-  /*
-   Disable interactions during confirmation.
-  */
 
   setTaskControlsEnabled(false);
 
   $("status").textContent =
+
     "Request activated. Please wait...";
 
-  /*
-   Save the result exactly once.
-  */
-
   saveTaskResult(
+
     true,
+
     screenName,
+
     completionTime
+
   );
 
-  /*
-   Advance automatically after 3 seconds.
-  */
+  state.phase = "confirmation";
 
-  state.confirmationTimer = window.setTimeout(() => {
+  state.confirmationDeadline =
 
-    state.confirmationTimer = null;
+    Date.now() +
+    CONFIRMATION_DURATION_MS;
 
-    advanceStudy();
+  saveProgress();
 
-  }, CONFIRMATION_DURATION_MS);
+  scheduleConfirmation();
 
 }
 
 
 /*
 ==================================================
-EXPLICIT ABANDONMENT
+CONFIRMATION TIMER
+==================================================
+*/
+
+function scheduleConfirmation() {
+
+  if (state.confirmationTimer !== null) {
+
+    clearTimeout(
+      state.confirmationTimer
+    );
+
+  }
+
+  const remaining = Math.max(
+
+    0,
+
+    state.confirmationDeadline - Date.now()
+
+  );
+
+  state.confirmationTimer = window.setTimeout(
+
+    () => {
+
+      state.confirmationTimer = null;
+
+      state.confirmationDeadline = 0;
+
+      afterTask();
+
+    },
+
+    remaining
+
+  );
+
+}
+
+
+/*
+==================================================
+EXPLICIT TASK ABANDONMENT
 ==================================================
 */
 
 function giveUpTask() {
 
-  if (state.finished) return;
+  if (
+    state.phase !== "active" ||
+    state.finished
+  ) {
+
+    return;
+
+  }
 
   const confirmed = window.confirm(
+
     "End this task without completing the request?"
+
   );
 
-  if (!confirmed) return;
+  if (!confirmed) {
+    return;
+  }
 
-  const completionTime = now();
+  const completionTime = Date.now();
 
   state.finished = true;
 
   saveTaskResult(
+
     false,
+
     state.screen,
+
     completionTime
+
   );
 
   setTaskControlsEnabled(false);
 
-  $("doneTitle").textContent =
-    "Task ended";
+  afterTask();
 
-  $("doneText").textContent =
-    "You selected 'I cannot complete this task'. " +
-    "Your response has been recorded.";
+}
+
+
+/*
+==================================================
+AFTER TASK: QUESTIONNAIRE TRANSITION
+==================================================
+*/
+
+function afterTask() {
 
   /*
-   The participant clicks Continue after giving up.
+   After Task 1:
+   show Form 2 and wait for participant.
   */
 
-  show("taskDone");
+  if (state.results.length === 1) {
+
+    state.phase = "between";
+
+    state.index = 1;
+
+    $("firstCondition").textContent =
+
+      labelFor(
+        state.results[0].c
+      );
+
+    $("betweenOutcome").textContent =
+
+      state.results[0].s
+
+        ? "Your first task was completed."
+
+        : "Your first task ended without a completed " +
+          "request. Please still evaluate the interface " +
+          "you used.";
+
+    $("form2Confirmed").checked = false;
+
+    $("continueTask2").disabled = true;
+
+    show("between");
+
+    saveProgress();
+
+  }
+
+  /*
+   After Task 2:
+   generate results code and show Form 3.
+  */
+
+  else if (state.results.length === 2) {
+
+    finishStudy();
+
+  }
 
 }
 
@@ -1121,18 +1830,25 @@ RESULTS ENCODING
 function encode(object) {
 
   const bytes = new TextEncoder().encode(
+
     JSON.stringify(object)
+
   );
 
   let binary = "";
 
   for (const byte of bytes) {
+
     binary += String.fromCharCode(byte);
+
   }
 
   return btoa(binary)
+
     .replace(/\+/g, "-")
+
     .replace(/\//g, "_")
+
     .replace(/=+$/g, "");
 
 }
@@ -1149,13 +1865,18 @@ function finishStudy() {
   if (state.results.length !== 2) {
 
     alert(
-      "The study cannot finish because " +
-      "two task results have not been recorded."
+
+      "Two task results are required."
+
     );
 
     return;
 
   }
+
+  state.phase = "finish";
+
+  state.index = 2;
 
   const payload = {
 
@@ -1169,25 +1890,36 @@ function finishStudy() {
 
   };
 
-  const code = "CABIN1." + encode(payload);
+  $("resultCode").textContent =
 
-  $("resultCode").textContent = code;
+    "CABIN1." + encode(payload);
+
+  $("secondCondition").textContent =
+
+    labelFor(
+      state.results[1].c
+    );
 
   $("copyFeedback").textContent = "";
 
-  const formsURL = MICROSOFT_FORMS_URL.trim();
-
-  if (formsURL) {
-
-    $("formsLink").href = formsURL;
-
-    $("formsLink").classList.remove("hidden");
-
-  }
-
   show("finish");
 
+  saveProgress();
+
 }
+
+
+/*
+==================================================
+ASSIGN MICROSOFT FORMS LINKS
+==================================================
+*/
+
+$("initialFormLink").href = FORMS.initial;
+
+$("task1FormLink").href = FORMS.first;
+
+$("finalFormLink").href = FORMS.final;
 
 
 /*
@@ -1200,10 +1932,28 @@ $("startStudy").onclick = async () => {
 
   const id = $("pid").value.trim();
 
-  if (!/^[a-zA-Z0-9_-]{2,40}$/.test(id)) {
+  if (
+    !/^[a-zA-Z0-9_-]{2,40}$/.test(id)
+  ) {
 
     $("welcomeError").textContent =
-      "Please enter a valid anonymous participant ID.";
+
+      "Enter the same anonymous participant ID " +
+      "you used in Form 1 " +
+      "(2–40 letters, numbers, underscores or hyphens).";
+
+    return;
+
+  }
+
+  if (
+    !$("form1Confirmed").checked
+  ) {
+
+    $("welcomeError").textContent =
+
+      "Please submit Form 1 and confirm your " +
+      "consent and age eligibility before starting.";
 
     return;
 
@@ -1214,22 +1964,23 @@ $("startStudy").onclick = async () => {
   button.disabled = true;
 
   $("welcomeError").textContent =
+
     "Loading experiment screens. Please wait...";
 
   try {
 
     if (!imagesReady) {
-      await preloadImages();
-    }
 
-    /*
-     Reset study data.
-    */
+      await preloadImages();
+
+    }
 
     state.pid = id;
 
     state.order = Math.random() < 0.5
+
       ? ["PCB", "SST"]
+
       : ["SST", "PCB"];
 
     state.index = 0;
@@ -1238,6 +1989,8 @@ $("startStudy").onclick = async () => {
 
     state.finished = false;
 
+    state.confirmationDeadline = 0;
+
     $("welcomeError").textContent = "";
 
     setupTask();
@@ -1245,6 +1998,7 @@ $("startStudy").onclick = async () => {
   } catch (error) {
 
     $("welcomeError").textContent =
+
       "The experiment could not load. " +
       error.message;
 
@@ -1278,19 +2032,32 @@ RESTART TASK BUTTON
 
 $("restartTask").onclick = () => {
 
-  if (state.finished) return;
+  if (
+    state.phase !== "active" ||
+    state.finished
+  ) {
+
+    return;
+
+  }
 
   state.restarts++;
 
-  log("restart", state.screen);
+  log(
+    "restart",
+    state.screen
+  );
 
   if (state.wrongPending) {
 
     state.recovery++;
 
     log(
+
       "recovery",
+
       "restart_after_error"
+
     );
 
   }
@@ -1302,6 +2069,8 @@ $("restartTask").onclick = () => {
   */
 
   render("home");
+
+  saveProgress();
 
 };
 
@@ -1321,13 +2090,37 @@ $("giveUp").onclick = () => {
 
 /*
 ==================================================
-CONTINUE AFTER ABANDONMENT
+FORM 2 CONFIRMATION
 ==================================================
 */
 
-$("nextTask").onclick = () => {
+$("form2Confirmed").onchange = () => {
 
-  advanceStudy();
+  $("continueTask2").disabled =
+
+    !$("form2Confirmed").checked;
+
+};
+
+
+/*
+==================================================
+CONTINUE TO TASK 2
+==================================================
+*/
+
+$("continueTask2").onclick = () => {
+
+  if (
+    state.phase !== "between" ||
+    !$("form2Confirmed").checked
+  ) {
+
+    return;
+
+  }
+
+  setupTask();
 
 };
 
@@ -1344,16 +2137,21 @@ $("copyCode").onclick = async () => {
 
   try {
 
-    await navigator.clipboard.writeText(code);
+    await navigator.clipboard.writeText(
+      code
+    );
 
     $("copyFeedback").textContent =
-      "Copied! Paste the code into Microsoft Forms.";
+
+      "Copied! Paste the complete code into Form 3.";
 
   } catch (error) {
 
     $("copyFeedback").textContent =
+
       "Automatic copying failed. " +
-      "Use 'Select code manually'.";
+      "Use 'Select code manually', " +
+      "then press Ctrl+C or Cmd+C.";
 
   }
 
@@ -1362,7 +2160,7 @@ $("copyCode").onclick = async () => {
 
 /*
 ==================================================
-MANUAL CODE SELECTION
+SELECT RESULTS CODE MANUALLY
 ==================================================
 */
 
@@ -1371,7 +2169,9 @@ $("selectCode").onclick = () => {
   const range = document.createRange();
 
   range.selectNodeContents(
+
     $("resultCode")
+
   );
 
   const selection = window.getSelection();
@@ -1381,31 +2181,201 @@ $("selectCode").onclick = () => {
   selection.addRange(range);
 
   $("copyFeedback").textContent =
-    "Code selected. Press Ctrl+C or Cmd+C.";
+
+    "Code selected. Press Ctrl+C or Cmd+C to copy.";
 
 };
 
 
 /*
 ==================================================
-LEAVING THE EXPERIMENT
+CLEAR SAVED STUDY DATA
 ==================================================
 */
 
-window.addEventListener("beforeunload", event => {
+$("clearStudy").onclick = () => {
 
-  if (
-    state.pid &&
-    state.results.length < 2
-  ) {
+  const confirmed = window.confirm(
 
-    event.preventDefault();
+    "Only clear the saved results after you have " +
+    "submitted Form 3 successfully. " +
+    "Clear saved study data now?"
 
-    event.returnValue = "";
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    localStorage.removeItem(
+      STORAGE_KEY
+    );
+
+  } catch (error) {
+
+    // Continue even if browser storage is unavailable.
 
   }
 
-});
+  window.location.reload();
+
+};
+
+
+/*
+==================================================
+RESTORE EXPERIMENT AFTER REFRESH
+==================================================
+*/
+
+function restoreView() {
+
+  if (!loadProgress()) {
+
+    show("welcome");
+
+    return;
+
+  }
+
+  $("pid").value = state.pid;
+
+
+  /*
+   Restore task instructions.
+  */
+
+  if (state.phase === "intro") {
+
+    setupTask();
+
+    return;
+
+  }
+
+
+  /*
+   Restore questionnaire transition.
+  */
+
+  if (state.phase === "between") {
+
+    afterTask();
+
+    return;
+
+  }
+
+
+  /*
+   Restore final results code.
+  */
+
+  if (state.phase === "finish") {
+
+    finishStudy();
+
+    return;
+
+  }
+
+
+  /*
+   Restore active task or confirmation.
+  */
+
+  if (
+
+    state.phase === "active" ||
+
+    state.phase === "confirmation"
+
+  ) {
+
+    render(
+      state.screen || "home"
+    );
+
+    show("task");
+
+    if (
+      state.phase === "confirmation"
+    ) {
+
+      setTaskControlsEnabled(false);
+
+      $("status").textContent =
+
+        "Request activated. Please wait...";
+
+      scheduleConfirmation();
+
+    } else {
+
+      setTaskControlsEnabled(true);
+
+      $("status").textContent =
+
+        "Task resumed after page refresh. " +
+        "The task timer continued running.";
+
+      log(
+
+        "page_restored",
+
+        state.screen
+
+      );
+
+    }
+
+  }
+
+}
+
+
+/*
+==================================================
+INITIALIZE EXPERIMENT
+==================================================
+*/
+
+restoreView();
+
+
+/*
+==================================================
+WARNING WHEN LEAVING EXPERIMENT
+==================================================
+*/
+
+window.addEventListener(
+
+  "beforeunload",
+
+  event => {
+
+    if (
+
+      state.pid &&
+
+      state.phase !== "finish" &&
+
+      state.phase !== "welcome"
+
+    ) {
+
+      event.preventDefault();
+
+      event.returnValue = "";
+
+    }
+
+  }
+
+);
 
 </script>
 
