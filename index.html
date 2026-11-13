@@ -599,6 +599,9 @@ function setupTask() {
 /*
  Start timer and reset task-level measurements.
 */
+/*
+ Start timer and reset task-level measurements.
+*/
 function beginTask() {
   state.start = now();
 
@@ -612,32 +615,73 @@ function beginTask() {
   state.restarts = 0;
   state.finished = false;
 
-// Reset controls for the new task.
-$("restartTask").disabled = false;
-$("giveUp").disabled = false;
-$("screen").style.pointerEvents = "auto";
+  // Enable controls for the new task.
+  $("restartTask").disabled = false;
+  $("giveUp").disabled = false;
+  $("screen").style.pointerEvents = "auto";
 
-show("task");
-render("home");
+  // Both PCB and SST start from the common home screen.
+  show("task");
+  render("home");
 
-log("task_started", state.condition);
+  log("task_started", state.condition);
+}
+
 /*
- Display the final interface screenshot for 3 seconds.
- Record task completion when the success screen is reached,
- not after the 3-second display period.
+ Display the final confirmation screenshot for 3 seconds.
+ Record success immediately, then automatically advance.
 */
 function showSuccessScreen(screenName) {
+
+  // Prevent recording the same task twice.
   if (state.finished) return;
+
+  // Stop the completion timer immediately.
+  const completionTime = now();
+
+  // Mark the task as finished.
+  state.finished = true;
 
   // Display the final screenshot.
   render(screenName);
 
-  // Record task completion immediately.
-  const completionTime = now();
+  // Disable controls during the confirmation display.
+  $("restartTask").disabled = true;
+  $("giveUp").disabled = true;
+  $("screen").style.pointerEvents = "none";
+
+  // Calculate task-completion time.
+  const elapsed = Math.round(completionTime - state.start);
+
+  log("success", screenName);
+
+  // Save the successful task result.
+  state.results.push({
+    c: state.condition,
+    s: 1,
+    ms: elapsed,
+    cl: state.clicks,
+    nav: state.transitions,
+    er: state.errors,
+    mc: state.misclicks,
+    rec: state.recovery,
+    rs: state.restarts,
+    end: screenName,
+    ev: state.events
+  });
 
   // Keep the final screenshot visible for 3 seconds.
   setTimeout(() => {
-    finishTask(true, completionTime);
+
+    // Advance to the next task or results-code page.
+    state.index++;
+
+    if (state.index < 2) {
+      setupTask();
+    } else {
+      finishStudy();
+    }
+
   }, 3000);
 }
 /*
