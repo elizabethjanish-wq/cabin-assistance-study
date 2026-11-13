@@ -487,12 +487,13 @@ function render(which) {
           state.wrongPending = false;
         }
 
-        state.transitions++;
+       state.transitions++;
 
-        log(
-          "navigation",
-          "pcb_menu->pcb_active"
-        );
+log(
+  "navigation",
+  "pcb_menu->pcb_active"
+);
+
 
         showSuccessScreen("pcb_active");
       }
